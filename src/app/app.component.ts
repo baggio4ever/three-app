@@ -15,7 +15,8 @@ export class AppComponent implements OnInit {
 		// this.creating_a_scene();
 		// this.drawing_lines();
 		// this.draw_cube();
-		this.draw_shpere();
+		// this.draw_shpere();
+		this.draw_geometries();
 	}
 	
 	// Getting Started: Creating a scene
@@ -176,6 +177,86 @@ export class AppComponent implements OnInit {
 		
 			requestAnimationFrame(tick);
 		  }
+	}
+
+	// https://ics.media/tutorial-three/geometry_general.html
+	draw_geometries() {
+		// レンダラーを作成
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( THREE_WIDTH, THREE_HEIGHT );
+		const el = document.getElementById('three');
+		el.appendChild( renderer.domElement );
+
+
+		// シーンを作成
+		const scene = new THREE.Scene();
+		
+		// カメラを作成
+		const camera = new THREE.PerspectiveCamera(45, THREE_WIDTH / THREE_HEIGHT, 1, 10000);
+		camera.position.set(0, 0, +800);
+		
+		// 球体を作成
+		const sphere_g = new THREE.SphereGeometry(80, 30, 30);
+		// 単色
+		const sphere_m = new THREE.MeshStandardMaterial({color: 0xFF0000});
+		// メッシュを作成
+		const sphere = new THREE.Mesh(sphere_g, sphere_m);
+		// 3D空間にメッシュを追加
+		scene.add(sphere);
+		
+		const cube_g = new THREE.BoxGeometry( 50, 50, 50 );
+		const cube_m = new THREE.MeshBasicMaterial( {color: 0x00FF00} );
+		const cube = new THREE.Mesh( cube_g, cube_m );
+		cube.position.x = 150;
+		scene.add( cube );
+
+		const plane_g = new THREE.PlaneGeometry( 800, 600, 32 );
+		const plane_m = new THREE.MeshBasicMaterial( {color: 0x0000FF, side: THREE.DoubleSide} );
+		const plane = new THREE.Mesh( plane_g, plane_m );
+		plane.position.z = -150;
+		scene.add( plane );
+
+		const cone_g = new THREE.ConeGeometry( 50, 140, 32 );
+		const cone_m = new THREE.MeshBasicMaterial( {color: 0xFF8888} );
+		const cone = new THREE.Mesh( cone_g, cone_m );
+		cone.position.x = -200;
+		scene.add( cone );
+
+		const cylinder_g = new THREE.CylinderGeometry( 50, 50, 80, 32 );
+		const cylinder_m = new THREE.MeshBasicMaterial( {color: 0xFF0000} );
+		const cylinder = new THREE.Mesh( cylinder_g, cylinder_m );
+		cylinder.position.y = 150;
+		scene.add( cylinder );
+
+		const torus_g = new THREE.TorusGeometry( 40, 10, 16, 100 );
+		const torus_m = new THREE.MeshBasicMaterial( { color: 0xFF0000 } );
+		const torus = new THREE.Mesh( torus_g, torus_m );
+		torus.position.y = -150;
+		scene.add( torus );
+
+		// 平行光源
+		const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+		directionalLight.position.set(1, 1, 1);
+		// シーンに追加
+		scene.add(directionalLight);
+		
+		tick();
+		
+		// 毎フレーム時に実行されるループイベントです
+		function tick() {
+			// メッシュを回転させる
+			sphere.rotation.y += 0.01;
+			cube.rotation.y += 0.01;
+			cone.rotation.x += 0.02;
+			cylinder.rotation.x += 0.01;
+			torus.rotation.x += 0.02;
+
+			// レンダリング
+			renderer.render(scene, camera);
+		
+			requestAnimationFrame(tick);
+		}
+
 	}
 }
 
