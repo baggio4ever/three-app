@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import * as THREE from 'three';
+// import * as THREE2 from 'three/examples/js/controls/OrbitControls';
+//declare var THREE.OrbitControls: any;
+import { OrbitControls } from 'three-orbitcontrols-ts';
 
 const THREE_WIDTH = 960;
 const THREE_HEIGHT = 540;
@@ -194,7 +197,23 @@ export class AppComponent implements OnInit {
 		// カメラを作成
 		const camera = new THREE.PerspectiveCamera(45, THREE_WIDTH / THREE_HEIGHT, 1, 10000);
 		camera.position.set(0, 0, +800);
-		
+
+		const controls = new OrbitControls(camera);
+		// How far you can dolly in and out ( PerspectiveCamera only )
+controls.minDistance = 0;
+controls.maxDistance = Infinity;
+
+controls.enableZoom = true;
+controls.zoomSpeed = 1.0;
+//this.enableZoom = true; // Set to false to disable zooming
+//this.zoomSpeed = 1.0;
+
+
+controls.enablePan = true; // Set to false to disable panning (ie vertical and horizontal translations)
+
+controls.enableDamping = true; // Set to false to disable damping (ie inertia)
+controls.dampingFactor = 0.25;
+
 		// 球体を作成
 		const sphere_g = new THREE.SphereGeometry(80, 30, 30);
 		// 単色
@@ -251,6 +270,8 @@ export class AppComponent implements OnInit {
 			cylinder.rotation.x += 0.01;
 			torus.rotation.x += 0.02;
 
+			controls.update();
+			
 			// レンダリング
 			renderer.render(scene, camera);
 		
@@ -266,6 +287,10 @@ export class AppComponent implements OnInit {
 // WebGL と JavaScript で学ぶ3D表現  Three.js入門サイト
 // https://ics.media/tutorial-three/index.html
 
+
+// three-orbitcontrols-ts
+// https://github.com/nicolaspanel/three-orbitcontrols-ts
+	
 
 // Blender
 
