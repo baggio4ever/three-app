@@ -183,12 +183,18 @@ export class AppComponent implements OnInit {
 	}
 
 	// https://ics.media/tutorial-three/geometry_general.html
+	// https://ics.media/tutorial-three/camera_orbitcontrols.html
+	// https://ics.media/tutorial-three/material_variation.html
+	// https://ics.media/tutorial-three/light_variation.html
+	// https://ics.media/tutorial-three/light_shadowmap.html
 	draw_geometries() {
 		// レンダラーを作成
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( THREE_WIDTH, THREE_HEIGHT );
 		const el = document.getElementById('three');
 		el.appendChild( renderer.domElement );
+
+		renderer.shadowMap.enabled = true;
 
 
 		// シーンを作成
@@ -200,19 +206,18 @@ export class AppComponent implements OnInit {
 
 		const controls = new OrbitControls(camera);
 		// How far you can dolly in and out ( PerspectiveCamera only )
-controls.minDistance = 0;
-controls.maxDistance = Infinity;
+		controls.minDistance = 0;
+		controls.maxDistance = Infinity;
 
-controls.enableZoom = true;
-controls.zoomSpeed = 1.0;
-//this.enableZoom = true; // Set to false to disable zooming
-//this.zoomSpeed = 1.0;
+		controls.enableZoom = true;
+		controls.zoomSpeed = 1.0;
+		//this.enableZoom = true; // Set to false to disable zooming
+		//this.zoomSpeed = 1.0;
 
+		controls.enablePan = true; // Set to false to disable panning (ie vertical and horizontal translations)
 
-controls.enablePan = true; // Set to false to disable panning (ie vertical and horizontal translations)
-
-controls.enableDamping = true; // Set to false to disable damping (ie inertia)
-controls.dampingFactor = 0.25;
+		controls.enableDamping = true; // Set to false to disable damping (ie inertia)
+		controls.dampingFactor = 0.25;
 
 		// 球体を作成
 		const sphere_g = new THREE.SphereGeometry(80, 30, 30);
@@ -220,6 +225,8 @@ controls.dampingFactor = 0.25;
 		const sphere_m = new THREE.MeshStandardMaterial({color: 0xFF0000});
 		// メッシュを作成
 		const sphere = new THREE.Mesh(sphere_g, sphere_m);
+		sphere.castShadow = true;
+		sphere.receiveShadow = true;
 		// 3D空間にメッシュを追加
 		scene.add(sphere);
 		
@@ -227,38 +234,71 @@ controls.dampingFactor = 0.25;
 		const cube_m = new THREE.MeshStandardMaterial( {color: 0x00FF00} );
 		const cube = new THREE.Mesh( cube_g, cube_m );
 		cube.position.x = 150;
+		cube.castShadow = true;
+		cube.receiveShadow = true;
 		scene.add( cube );
 
-		const plane_g = new THREE.PlaneGeometry( 800, 600, 32 );
+		const plane_g = new THREE.PlaneGeometry( 1000, 800, 32 );
 		const plane_m = new THREE.MeshStandardMaterial( {color: 0x0000FF, side: THREE.DoubleSide} );
 		const plane = new THREE.Mesh( plane_g, plane_m );
-		plane.position.z = -150;
+		plane.position.z = -100;
+		// plane.castShadow = true;
+		plane.receiveShadow = true;
 		scene.add( plane );
 
 		const cone_g = new THREE.ConeGeometry( 50, 140, 32 );
 		const cone_m = new THREE.MeshStandardMaterial( {color: 0xFF8888} );
 		const cone = new THREE.Mesh( cone_g, cone_m );
 		cone.position.x = -200;
+		cone.castShadow = true;
+		cone.receiveShadow = true;
 		scene.add( cone );
 
 		const cylinder_g = new THREE.CylinderGeometry( 50, 50, 80, 32 );
-		const cylinder_m = new THREE.MeshStandardMaterial( {color: 0xFF0000} );
+		const cylinder_m = new THREE.MeshStandardMaterial( {color: 0xFF00AA} );
 		const cylinder = new THREE.Mesh( cylinder_g, cylinder_m );
 		cylinder.position.y = 150;
+		cylinder.castShadow = true;
+		cylinder.receiveShadow = true;
 		scene.add( cylinder );
 
 		const torus_g = new THREE.TorusGeometry( 40, 10, 16, 100 );
-		const torus_m = new THREE.MeshStandardMaterial( { color: 0xFF0000 } );
+		const torus_m = new THREE.MeshStandardMaterial( { color: 0xAAAAAA } );
 		const torus = new THREE.Mesh( torus_g, torus_m );
 		torus.position.y = -150;
+		torus.castShadow = true;
+		torus.receiveShadow = true;
 		scene.add( torus );
 
 		// 平行光源
-		const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
-		directionalLight.position.set(1, 1, 1);
+		// const directionalLight = new THREE.DirectionalLight(0xFFFFFF);
+		// directionalLight.position.set(1, 1, 1);
+		// directionalLight.castShadow = true;
 		// シーンに追加
-		scene.add(directionalLight);
+		// scene.add(directionalLight);
+
+		// 照明を作成
+		const spotLight = new THREE.SpotLight(0xFFFFFF, 2, 1400, Math.PI / 4, 1);
+		spotLight.position.set(200,100,400);
+		// ライトに影を有効にする
+		spotLight.castShadow = true;
+		spotLight.shadow.mapSize.width = 1024;
+		spotLight.shadow.mapSize.height = 1024;
+
+		spotLight.shadow.camera.near = 100;
+		spotLight.shadow.camera.far = 4000;
+		//spotLight.shadow.camera.fov = 30;
+
+		scene.add(spotLight);
+
+		const lh = new THREE.SpotLightHelper(spotLight);
+		scene.add(lh);
 		
+		// 環境光源を作成
+		// new THREE.AmbientLight(色, 光の強さ)
+		const amb_light = new THREE.AmbientLight(0xFFFFFF, 1.0);
+		scene.add(amb_light);
+
 		tick();
 		
 		// 毎フレーム時に実行されるループイベントです
@@ -271,6 +311,7 @@ controls.dampingFactor = 0.25;
 			torus.rotation.x += 0.02;
 
 			controls.update();
+			lh.update();
 
 			// レンダリング
 			renderer.render(scene, camera);
