@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, VERSION } from '@angular/core';
 import * as THREE from 'three';
 // import * as THREE2 from 'three/examples/js/controls/OrbitControls';
 //declare var THREE.OrbitControls: any;
@@ -13,6 +13,8 @@ const THREE_HEIGHT = 540;
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+
+	ng_version = VERSION;
 
   ngOnInit() {
 		// this.creating_a_scene();
